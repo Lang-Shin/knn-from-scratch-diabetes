@@ -3,6 +3,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+def custom_train_test(features, labels, train_size=0.8):
+    num_samples = len(features)
+
+    indices = np.arange(num_samples)
+
+    np.random.shuffle(indices)  # shuffle data to avoid bias
+
+    split_point = (train_size * num_samples)
+
+    train_data_id = indices[ : int(split_point)]  
+    test_data_id = indices[int(split_point) : ]
+
+    X_train, X_test = features[train_data_id], features[test_data_id]
+    y_train, y_test = labels[train_data_id], labels[test_data_id]
+
+    return X_train, X_test, y_train, y_test
+
+
 df = pd.read_csv("dataset/data.csv")
 
 """
@@ -18,9 +36,6 @@ for col in fix_cols:
     df[col] = df[col].fillna(median)                # Replace NaN with median(col)
 
 
-print(df)
-
-
 X = df.drop("Outcome", axis=1)
 y = df['Outcome']
 
@@ -29,12 +44,18 @@ std = X.std()
 
 X_scaled = (df - mean) / std
 
-init_df = X_scaled.drop("Outcome", axis=1)
+init_df = X_scaled.drop("Outcome", axis=1)          # Remove the outcome col in the feature scalled data
 
-feat_scale_df = pd.concat([init_df, y], axis=1)
+feat_scale_df = pd.concat([init_df, y], axis=1)     # Join feature scalled data with labeled one
 
 data_arr = feat_scale_df.values  # Convert to numpy array for faster math
 
-feature = data_arr[:, :-1]      # features
+features = data_arr[:, :-1]      # features
 labels = data_arr[:, -1]        # labeled data
 
+X_train, X_test, y_train, y_test = custom_train_test(features, labels)
+
+print("\n\nX Train : ", X_train)
+print("\n\nX Test : ", X_test)
+print("\n\nY Train : ", y_train)
+print("\n\nY Train : ", y_test)
