@@ -4,29 +4,40 @@ import matplotlib.pyplot as plt
 
 
 def custom_train_test(features, labels, train_size=0.8):
+    """Train features and labels"""
+
     num_samples = len(features)
 
     indices = np.arange(num_samples)
 
     np.random.shuffle(indices)  # shuffle data to avoid bias
 
-    split_point = (train_size * num_samples)
+    split_point = (train_size * num_samples)            # 80% of the dataset to be train
 
     train_data_id = indices[ : int(split_point)]  
     test_data_id = indices[int(split_point) : ]
 
-    X_train, X_test = features[train_data_id], features[test_data_id]
-    y_train, y_test = labels[train_data_id], labels[test_data_id]
+    X_train, X_test = features[train_data_id], features[test_data_id]       # train and test features
+    y_train, y_test = labels[train_data_id], labels[test_data_id]           # train and test labels
 
     return X_train, X_test, y_train, y_test
 
 
-def get_distances(test_point, X_train):
-    difference = test_point - X_train
+def predict_patient(test_point, X_train, y_train, k):
+    """Predicts if the test_point(patient) has diabetes according to its nearest neighbors"""
 
-    distances = np.sqrt(np.sum(difference**2), axis=1)
+    difference = test_point - X_train                           # (x2 - x1) (y2 - y1)
 
-    return distances
+    distances = np.sqrt(np.sum(difference**2, axis=1))
+
+    nearest_neighbors_indices = np.argsort(distances)[:k]       # sort indices
+
+    neighbor_labels = y_train[nearest_neighbors_indices]
+
+    prediction = 1 if np.sum(neighbor_labels) > (k/2) else 0
+
+    return prediction
+
 
 
 df = pd.read_csv("dataset/data.csv")
@@ -65,3 +76,5 @@ X_train, X_test, y_train, y_test = custom_train_test(features, labels)
 
 patient = X_test[0]
 
+print(patient)
+print(predict_patient(patient, X_train, y_train, 3))
