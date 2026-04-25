@@ -21,6 +21,14 @@ def custom_train_test(features, labels, train_size=0.8):
     return X_train, X_test, y_train, y_test
 
 
+def get_distances(test_point, X_train):
+    difference = test_point - X_train
+
+    distances = np.sqrt(np.sum(difference**2), axis=1)
+
+    return distances
+
+
 df = pd.read_csv("dataset/data.csv")
 
 """
@@ -55,7 +63,5 @@ labels = data_arr[:, -1]        # labeled data
 
 X_train, X_test, y_train, y_test = custom_train_test(features, labels)
 
-print("\n\nX Train : ", X_train)
-print("\n\nX Test : ", X_test)
-print("\n\nY Train : ", y_train)
-print("\n\nY Train : ", y_test)
+patient = X_test[0]
+
