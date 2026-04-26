@@ -39,6 +39,35 @@ def predict_patient(test_point, X_train, y_train, k):
     return prediction
 
 
+def calculate_accuracy(y_test, predictions):
+    """
+                                num of correct predictions
+    Calculate Accuracy  = ------------------------------------
+                                    total predictions
+    """
+    correct = np.sum(y_test == predictions)
+
+    return correct/len(y_test)
+
+
+def test_accuracy(n, X_test, y_test, X_train, y_train):
+    """Test model accuracy"""
+    results = []
+
+    for k in n:
+        predictions = []
+
+        for patient in X_test:
+            pred = predict_patient(patient, X_train, y_train, k)
+            predictions.append(pred)
+
+        acc = calculate_accuracy(y_test, predictions)
+        results.append(acc)
+
+    return results
+
+
+
 def smanualh_icomputej(patient, samples, labels, k):
     """Manual Computing Essentials :)"""
 
@@ -90,12 +119,20 @@ X_train, X_test, y_train, y_test = custom_train_test(features, labels)
 """
 Manual Solving
 """
-patient = X_test[0]
-ten_training_samples = X_train[0:10]        
-ten_training_labels = y_train[0:10]
+# patient = X_test[0]
+# ten_training_samples = X_train[0:10]        
+# ten_training_labels = y_train[0:10]
 
-print("\n\n", feat_scale_df.head(20))
+# print("\n\n", feat_scale_df.head(20))
 
 # smanualh_icomputej(patient, ten_training_labels, ten_training_samples, 5)
 
-# print("Prediction : ", predict_patient(patient, ten_training_samples, ten_training_labels, 3))
+# print("Prediction : ", predict_patient(patient, X_train, y_train, 7))
+
+n = 9
+k = np.arange(1, 2*n-1, 2)
+
+accuracy_result = test_accuracy(k, X_test, y_test, X_train, y_train)
+
+for i in range(n-1):
+    print(f"K = {k[i]}\t Accuracy : {accuracy_result[i]:.4f}")
