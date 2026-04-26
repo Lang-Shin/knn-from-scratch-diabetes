@@ -39,6 +39,19 @@ def predict_patient(test_point, X_train, y_train, k):
     return prediction
 
 
+def smanualh_icomputej(patient, samples, labels, k):
+    """Manual Computing Essentials :)"""
+
+    print("\nPatient : ", patient)
+
+    print("\n10 Training samples : ")
+    for i in range(10):
+        print(samples[i])
+
+    print("\n10 Trainning labels : ")
+    for i in range(10):
+        print(labels[i])
+
 
 df = pd.read_csv("dataset/data.csv")
 
@@ -74,7 +87,15 @@ labels = data_arr[:, -1]        # labeled data
 
 X_train, X_test, y_train, y_test = custom_train_test(features, labels)
 
+"""
+Manual Solving
+"""
 patient = X_test[0]
+ten_training_samples = X_train[0:10]        
+ten_training_labels = y_train[0:10]
 
-print(patient)
-print(predict_patient(patient, X_train, y_train, 3))
+print("\n\n", feat_scale_df.head(20))
+
+# smanualh_icomputej(patient, ten_training_labels, ten_training_samples, 5)
+
+# print("Prediction : ", predict_patient(patient, ten_training_samples, ten_training_labels, 3))
