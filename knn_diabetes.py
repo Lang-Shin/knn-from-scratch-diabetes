@@ -38,6 +38,15 @@ def predict_patient(test_point, X_train, y_train, k):
 
     return prediction
 
+def get_confusion_matrix(y_test, predictions):
+
+    TP = np.sum((y_test == 1) & (predictions == 1))
+    TN = np.sum((y_test == 0) & (predictions == 0))
+    FP = np.sum((y_test == 0) & (predictions == 1))
+    FN = np.sum((y_test == 1) & (predictions == 0))
+
+    return np.array([[TP, TN], [FP, FN]])
+
 
 def calculate_accuracy(y_test, predictions):
     """
@@ -50,23 +59,22 @@ def calculate_accuracy(y_test, predictions):
     return correct/len(y_test)
 
 
-def test_accuracy(n, X_test, y_test, X_train, y_train):
+def test_acc_cm(n, X_test, y_test, X_train, y_train):
     """Test model accuracy"""
-    results = []
+    results = {}
 
     for k in n:
-        predictions = []
-
-        for patient in X_test:
-            pred = predict_patient(patient, X_train, y_train, k)
-            predictions.append(pred)
+        predictions = np.array([predict_patient(tp, X_train, y_train, k) for tp in X_test])
 
         acc = calculate_accuracy(y_test, predictions)
-        results.append(acc)
+        cm = get_confusion_matrix(y_test, predictions)
+
+        results[k] = {
+            "accuracy" : acc,
+            "confusion_matrix" : cm
+        }
 
     return results
-
-
 
 def smanualh_icomputej(patient, samples, labels, k):
     """Manual Computing Essentials :)"""
@@ -129,10 +137,12 @@ Manual Solving
 
 # print("Prediction : ", predict_patient(patient, X_train, y_train, 7))
 
-n = 9
-k = np.arange(1, 2*n-1, 2)
+n = 8
+k = np.arange(1, 2*n+1, 2)
 
-accuracy_result = test_accuracy(k, X_test, y_test, X_train, y_train)
+results = test_acc_cm(k, X_test, y_test, X_train, y_train)
 
-for i in range(n-1):
-    print(f"K = {k[i]}\t Accuracy : {accuracy_result[i]:.4f}")
+for i in range(n):
+    print(f"K = {k[i]}")
+    print(f"Accuracy : {results[k[i]]['accuracy']:.4f}")
+    print(f"Confusion Matrix : {results[k[i]]['confusion_matrix']}\n\n")
