@@ -146,3 +146,90 @@ for i in range(n):
     print(f"K = {k[i]}")
     print(f"Accuracy : {results[k[i]]['accuracy']:.4f}")
     print(f"Confusion Matrix : {results[k[i]]['confusion_matrix']}\n\n")
+
+
+#  Visualize Accuracy vs K + Compare with Logistic Regression
+
+# Accuracy vs K
+
+k_values = list(results.keys())
+accuracies = [results[k]['accuracy'] for k in k_values]
+
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(k_values, accuracies, marker='o', color="#07852B")
+plt.title('KNN Accuracy vs K Value')
+plt.xlabel('K')
+plt.ylabel('Accuracy')
+plt.xticks(k_values)
+plt.ylim(0, 1)
+plt.grid(True, alpha=0.6)
+
+
+# --- Logistic Regression (Manual Implementation, No sklearn) ---
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+
+def logistic_train(X, y, lr=0.1, epochs=1000):
+    """Train Logistic Regression using Gradient Descent"""
+    m, n = X.shape
+    weights = np.zeros(n)
+    bias = 0
+
+    for _ in range(epochs):
+        z = X @ weights + bias
+        pred = sigmoid(z)
+
+        dw = (1 / m) * (X.T @ (pred - y))
+        db = (1 / m) * np.sum(pred - y)
+
+        weights -= lr * dw
+        bias -= lr * db
+
+    return weights, bias
+
+
+def logistic_predict(X, weights, bias, threshold=0.5):
+    z = X @ weights + bias
+    probs = sigmoid(z)
+    return (probs >= threshold).astype(int)
+
+
+# Train Logistic Regression on same train/test split
+lr_weights, lr_bias = logistic_train(X_train, y_train)
+lr_predictions = logistic_predict(X_test, lr_weights, lr_bias)
+
+lr_accuracy = calculate_accuracy(y_test, lr_predictions)
+lr_cm = get_confusion_matrix(y_test, lr_predictions)
+
+print("\n\n========== Logistic Regression Comparison ==========")
+print(f"Logistic Regression Accuracy : {lr_accuracy:.4f}")
+print(f"Logistic Regression Confusion Matrix :\n{lr_cm}")
+
+# Best KNN accuracy for comparison
+best_k = max(results, key=lambda k: results[k]['accuracy'])
+best_knn_acc = results[best_k]['accuracy']
+
+print(f"\nBest KNN (K={best_k}) Accuracy   : {best_knn_acc:.4f}")
+print(f"Logistic Regression Accuracy     : {lr_accuracy:.4f}")
+
+# --- Bar Chart: KNN best vs Logistic Regression ---
+plt.subplot(1, 2, 2)
+models = [f'KNN (K={best_k})', 'Logistic Regression']
+accs = [best_knn_acc, lr_accuracy]
+colors = ['steelblue', 'tomato']
+
+bars = plt.bar(models, accs, color=colors, width=0.4)
+plt.title('KNN vs Logistic Regression')
+plt.ylabel('Accuracy')
+plt.ylim(0, 1)
+for bar, acc in zip(bars, accs):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
+             f'{acc:.4f}', ha='center', va='bottom', fontweight='bold')
+plt.grid(True, alpha=0.6)
+
+plt.tight_layout()
+plt.show()
