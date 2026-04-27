@@ -72,7 +72,7 @@ A manual Logistic Regression model was implemented from scratch using **Gradient
 
 ## Output Graph
 
-Running the script generates `bonus_results.png` containing two charts:
+<img src="imgs/plot.png">
 
 - **Left:** KNN Accuracy vs K Value — shows accuracy trend across all K values
 - **Right:** Bar chart comparing KNN (best K) vs Logistic Regression accuracy
